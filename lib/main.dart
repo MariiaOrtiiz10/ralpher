@@ -23,3 +23,7 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+
+//La Vista
+// En el método build antes de agregar el ListView deberíamos agregar los widgets de ChangeNotifierProvider y Consumer,con el primero le damos contexto a la vista de 
+// quien puede realizar modificaciones sobre ella, con el segundo especificamos qué partes son las que se verán afectadas durante cada update

@@ -1,0 +1,30 @@
+class User {
+  String id;
+  String? name;
+  String? surnaname;
+  String? imgname;
+  String? imgurl;
+  
+
+  User({required this.id, this.name, this.surnaname,this.imgname,this.imgurl});
+
+  Map<String, dynamic> toJson(){
+    return{
+      'name':name,
+      'surname': surnaname,
+      'imgname':imgname,
+      'imgurl':imgurl,
+    };
+  }
+  factory User.fromJson(Map<String, dynamic>json){
+    return User(
+      id: json['id'],
+      name: json['name'],
+      surnaname: json['surname'],
+      imgname: json['imgname'],
+      imgurl: json['imgurl'],
+     );
+  }
+
+
+}

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ralpher/core/services/auth_service.dart';
+import 'package:ralpher/data/models/user.dart';
 
+
+ User? currentUser;
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
