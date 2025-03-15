@@ -42,4 +42,6 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+    <!-- Android app needs explicit permission to use the internet connection on the user's device which is required to communicate with Supabase APIs. -->
+      <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
