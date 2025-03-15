@@ -3,10 +3,9 @@ Servicio de autentificación
 unauthenticated -> login page
 authenticated -> profile page
 */
-
 import 'package:flutter/material.dart';
-import 'package:ralpher/presentation/views/home_page.dart';
 import 'package:ralpher/presentation/views/login_page.dart';
+import 'package:ralpher/presentation/views/mainhome_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGate extends StatelessWidget {
@@ -35,7 +34,7 @@ class AuthGate extends StatelessWidget {
         //check if there is a valid session current
         final session = snapshot.hasData ? snapshot.data!.session : null;
           if(session != null){
-            return const HomePage();
+            return const MainHomePage();
           }else{
             return const LoginPage();
           }

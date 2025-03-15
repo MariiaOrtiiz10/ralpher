@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ralpher/core/services/auth_service.dart';
-import 'package:ralpher/data/models/user.dart';
+import 'package:ralpher/data/models/user_model.dart';
 import 'package:ralpher/data/repositories/user_repository.dart';
+
 
 
 class HomePage extends StatefulWidget {
@@ -14,9 +15,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final authService = AuthService();
   final userRepository = UserRepository();
+  UserModel? currentUser;
+  //UserModel currentUser = userRepository().getCurrentUserData();
+  @override
+  void initState(){
 
-  //User? currentUser = userRepository().getCurrentUserData();
-
+  }
   void logout() async{
     await authService.signOut();
   }
@@ -27,23 +31,19 @@ class _HomePageState extends State<HomePage> {
     //get usermail
     final userEmail = authService.getCurrentUserEmail();
     return Scaffold(
-      appBar: AppBar(title: const Text("Home")),
-      body:ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        children: [
-          ElevatedButton(
-            onPressed: logout, 
-            child: const Text("Log out"),
-          ),
-           const SizedBox(height: 15),
-           Text("Email: "),
-           Text(userEmail.toString())
-           
-        ]
-      )
-      
-      
-
+      body:
+       ListView(
+         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+         children: [
+           ElevatedButton(
+             onPressed: logout, 
+             child: const Text("Log out"),
+           ),
+            const SizedBox(height: 15),
+          Text("Email: "),
+            Text(userEmail.toString())
+         ]
+       )          
     );
   }
 }

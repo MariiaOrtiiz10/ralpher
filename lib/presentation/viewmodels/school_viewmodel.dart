@@ -9,5 +9,6 @@ Future<void> _pickImage() async{
 }
 //Function tu upload the image 
 
+
 //Function to create a Schoolobjet and insert it into supabase
 }

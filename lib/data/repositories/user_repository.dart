@@ -1,3 +1,4 @@
+import 'package:ralpher/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserRepository {
@@ -21,6 +22,15 @@ class UserRepository {
       print('Error fetching user data:  $e');
     }
     return null;
+  }
 
+  //Function to saver user data to Supabase "users" table
+  Future<void> saveUserToDatabase(UserModel registerUser)async{
+    try{
+      await _supabase.from('users')
+      .insert(registerUser.toJson());
+    }catch(e){
+      print('Error save user data to supabase users table:  $e');
+    }
   }
 }
