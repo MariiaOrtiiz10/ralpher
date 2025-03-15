@@ -3,16 +3,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class UserRepository {
     final SupabaseClient _supabase = Supabase.instance.client;
 
-//Devuelve un objeto User si encuentra el usuario en la base de datos -->  Busca en la tabla users el usuario cuyo email coincida con el del usuario autenticado.
+//Devuelve un objeto User si encuentra el usuario en la base de datos -->  Busca en la tabla users el usuario cuyo id coincida con el del usuario autenticado.
 //Si pongo .select('id')
-  Future<User?> _getCurrentUserData() async {
+  Future<User?> getCurrentUserData() async {
     final user = _supabase.auth.currentUser;
     try{
       if(user != null){
         final response = await 
         _supabase.from('users')
         .select()
-        .eq('email', user.email ?? '')
+        .eq('id', user.id)
         .single();
 
         return User.fromJson(response);

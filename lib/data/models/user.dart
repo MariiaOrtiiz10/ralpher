@@ -8,6 +8,7 @@ class User {
 
   User({required this.id, this.name, this.surnaname,this.imgname,this.imgurl});
 
+  //Para guaradrlo en la bbdd. (obj --> mapa json)
   Map<String, dynamic> toJson(){
     return{
       'name':name,
@@ -16,6 +17,7 @@ class User {
       'imgurl':imgurl,
     };
   }
+  //Para la app. (mapa json --> obj)
   factory User.fromJson(Map<String, dynamic>json){
     return User(
       id: json['id'],

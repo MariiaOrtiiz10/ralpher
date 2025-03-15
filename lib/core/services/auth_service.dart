@@ -10,6 +10,10 @@ class AuthService {
       password: password,
     );
   }
+  //Function to saver user data to Supabase "users" table
+  Future<void> saveUserToDatabase(User user)async{
+    
+  }
   //Sign in with email and password
   Future<AuthResponse>signInWithEmailPassword(String email, String password) async{
     return await _supabase.auth.signInWithPassword(
