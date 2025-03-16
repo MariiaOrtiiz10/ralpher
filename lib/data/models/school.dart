@@ -1,13 +1,14 @@
 class School {
-   String id;
+   String? id;
    String name;
    String? color;
    String? image;
 
-  School({required this.id, required this.name, this.color, this.image });
+  School({ this.id, required this.name, this.color, this.image });
 
   Map<String, dynamic> toJson(){
     return{
+      'id':id,
       'name':name,
       'color': color,
       'image':image,

@@ -51,8 +51,6 @@ class _SettingsPageState extends State<SettingsPage> {
              child: const Text("Log out"),
            ),
             const SizedBox(height: 15),
-          Text("Email: "),
-            Text(userEmail.toString()),
             Text("DATOS DEL USUARIO"),
             if (isLoading)
             Center(child: CircularProgressIndicator())
@@ -62,6 +60,8 @@ class _SettingsPageState extends State<SettingsPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text("Email: "),
+                Text(userEmail.toString()),
                 Text("Id: ${currentUser?.id ?? "null"}"),
                 Text("Name: ${currentUser?.name ?? "null"}"),
                 Text("Surname: ${currentUser?.surname ?? "null"}"),

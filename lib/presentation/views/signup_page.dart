@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ralpher/core/services/auth_service.dart';
-import 'package:ralpher/data/models/user_model.dart';
-import 'package:ralpher/data/repositories/user_repository.dart';
+// import 'package:ralpher/data/models/user_model.dart';
+// import 'package:ralpher/data/repositories/user_repository.dart';
 import 'package:ralpher/presentation/views/login_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -12,9 +12,9 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  //get auth serviceç
+  //get auth service
   final _authService = AuthService();
-  final _userRepository = UserRepository();
+  // final _userRepository = UserRepository();
   //text controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -22,18 +22,18 @@ class _SignupPageState extends State<SignupPage> {
   void signup() async{
     final email = _emailController.text;
     final password = _passwordController.text;
-    final registerUser = UserModel(
-      id: '',
-      name: '',
-      surname: '',
-      imgurl: '',
-      imgname: '',
-    );
+    // final registerUser = UserModel(
+    //   id: '',
+    //   name: '',
+    //    surname: '',
+    //    imgurl: '',
+    //    imgname: '',
+    //  );
     //attempt login
     try{
       final authResponse = await _authService.signUpWithEmailPassword(email, password);
-      registerUser.id = authResponse.user!.id;
-      await _userRepository.saveUserToDatabase(registerUser);
+      // registerUser.id = authResponse.user!.id;
+      // await _userRepository.saveUserToDatabase(registerUser);
      //para cerrar la pantalla(sigup).
       Navigator.pop(context);
     }catch(e){

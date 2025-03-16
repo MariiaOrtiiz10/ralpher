@@ -18,6 +18,7 @@ class AuthService {
       password: password,
     );
   }
+  
   //sign out
   Future<void> signOut() async{
     await _supabase.auth.signOut();

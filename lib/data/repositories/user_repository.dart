@@ -17,7 +17,7 @@ class UserRepository {
         .select()
         .eq('id', user.id)
         .single();
-        print("Respuesta de Supabase: $response");
+        print(response);
         return UserModel.fromJson(response);
       }
     }catch(e){
@@ -25,8 +25,7 @@ class UserRepository {
     }
     return null;
   }
-
-  //Function to saver user data to Supabase "users" table
+  //Function to saver user data to Supabase "users" table(no hace falta)
   Future<void> saveUserToDatabase(UserModel registerUser)async{
     try{
       await _supabase.from('users')
