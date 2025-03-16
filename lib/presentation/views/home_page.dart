@@ -1,12 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:ralpher/core/services/auth_service.dart';
 import 'package:ralpher/data/models/user_model.dart';
-import 'package:ralpher/data/repositories/user_repository.dart';
 import 'package:image_picker/image_picker.dart';
-
-
+import 'package:flutter/foundation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,38 +12,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final authService = AuthService();
-  final userRepository = UserRepository();
+  
   UserModel? currentUser;
   File ? _selectedImage;
-
-  //UserModel currentUser = userRepository().getCurrentUserData();
-  @override
-  void initState(){
-
-  }
-  void logout() async{
-    await authService.signOut();
-  }
-
- 
+  Uint8List? _webImage;
 
   @override
   Widget build(BuildContext context) {
     //get usermail
-    final userEmail = authService.getCurrentUserEmail();
     return Scaffold(
       body:
        ListView(
          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
          children: [
-           ElevatedButton(
-             onPressed: logout, 
-             child: const Text("Log out"),
-           ),
-            const SizedBox(height: 15),
-          Text("Email: "),
-            Text(userEmail.toString()),
 
             const SizedBox(height: 50),
             ElevatedButton(
@@ -75,6 +52,7 @@ class _HomePageState extends State<HomePage> {
       _selectedImage = File(returnedImage!.path);
     });
   }
+
 
  Future pickImageFromCamera() async{
     final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);

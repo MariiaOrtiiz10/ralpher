@@ -25,7 +25,7 @@ class _SignupPageState extends State<SignupPage> {
     final registerUser = UserModel(
       id: '',
       name: '',
-      surnaname: '',
+      surname: '',
       imgurl: '',
       imgname: '',
     );

@@ -1,3 +1,4 @@
+
 import 'package:ralpher/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -6,7 +7,8 @@ class UserRepository {
 
 //Devuelve un objeto User si encuentra el usuario en la base de datos -->  Busca en la tabla users el usuario cuyo id coincida con el del usuario autenticado.
 //Si pongo .select('id')
-  Future<User?> getCurrentUserData() async {
+
+  Future<UserModel?> getCurrentUserData() async {
     final user = _supabase.auth.currentUser;
     try{
       if(user != null){
@@ -15,8 +17,8 @@ class UserRepository {
         .select()
         .eq('id', user.id)
         .single();
-
-        return User.fromJson(response);
+        print("Respuesta de Supabase: $response");
+        return UserModel.fromJson(response);
       }
     }catch(e){
       print('Error fetching user data:  $e');
