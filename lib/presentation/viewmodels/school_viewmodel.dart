@@ -30,28 +30,28 @@ File? _selectedImage;
   }
 //Function tu upload the image 
 
-//  Future<String?> _uploadImage(ImagePicker picker, XFile? selectedImage) async {
-//     if (selectedImage == null) return null; // Verificamos que haya una imagen
+Future<String?> _uploadImage(ImagePicker picker, XFile? selectedImage) async {
+   if (selectedImage == null) return null; // Verificamos que haya una imagen
 
-//     try {
-//       final supabase = Supabase.instance.client; // Instancia correcta de Supabase
-//       final bytes = await selectedImage!.readAsBytes();
-//       final fileExt = selectedImage!.path.split('.').last;
-//       final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
-//       final filePath = 'uploads/$fileName';
+   try {
+     final supabase = Supabase.instance.client; // Instancia correcta de Supabase
+     final bytes = await selectedImage!.readAsBytes();
+     final fileExt = selectedImage!.path.split('.').last;
+     final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+     final filePath = 'uploads/$fileName';
 
-//       final storageResponse = await supabase.storage.from('images').uploadBinary(
-//             filePath,
-//             bytes,
-//             fileOptions: FileOptions(contentType: selectedImage!.mimeType), // Corregido
-//           );
+     final storageResponse = await supabase.storage.from('images').uploadBinary(
+           filePath,
+           bytes,
+           fileOptions: FileOptions(contentType: selectedImage!.mimeType), // Corregido
+         );
 
-//       return storageResponse;
-//     } catch (e) {
-//       print('Error al subir la imagen: $e');
-//       return null;
-//     }
-//   }
+    return storageResponse;
+    } catch (e) {
+     print('Error al subir la imagen: $e');
+     return null;
+  }
+}
 //Function to create a Schoolobjet and insert it into supabase
 }
 
