@@ -6,13 +6,10 @@ class SchoolRepository {
   final SupabaseClient _supabase =  Supabase.instance.client;
   //Create
   Future<void> createSchool(String name, String? color, String? image) async {
-    print("Creando escuela con nombre: $name");
   final school = School(name: name, color: color, image: image);
-    print("Escuela creada: ${school.toJson()}");
   final response=await _supabase.from("schools")
     .insert(
       school.toJson()).select();
-  print("Respuesta de Supabase: $response");
   }
 
   Future<void> saveSchoolToSchoolUser(int idSchool)async{
