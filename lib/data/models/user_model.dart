@@ -18,7 +18,7 @@ class UserModel {
     };
   }
   //Para la app. (mapa json --> obj)
-  factory UserModel.fromJson(Map<String, dynamic>json){
+  factory UserModel.fromJson(Map<String, dynamic> json){
     return UserModel(
       id: json['id'],
       name: json['name'],

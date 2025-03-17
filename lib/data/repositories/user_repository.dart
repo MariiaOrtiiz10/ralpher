@@ -25,6 +25,7 @@ class UserRepository {
     }
     return null;
   }
+  
   //Function to saver user data to Supabase "users" table(no hace falta)
   Future<void> saveUserToDatabase(UserModel registerUser)async{
     try{

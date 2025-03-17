@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:ralpher/data/models/user_model.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart';
+import 'package:popover/popover.dart';
+import 'package:ralpher/data/models/school.dart';
 import 'package:ralpher/data/repositories/school_repository.dart';
+import 'package:ralpher/widgets/popover_item.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,91 +15,136 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController inputTextName = TextEditingController();
-
-  UserModel? currentUser;
+  List<Map<String, dynamic>> schools = [];
+  final SchoolRepository _schoolRepository = SchoolRepository();
   // File ? _selectedImage;
   // Uint8List? _webImage;
 
-  void createSchool(){
-    showDialog(context: context,
-     builder:(context) => AlertDialog(
-      content: 
-      TextField(
-        controller: inputTextName,
-        decoration: InputDecoration(hintText: "Nombre de la escuela"),
-      ),
-      actions: [
-        MaterialButton(
-          child: Text("Cancel"),
-          onPressed:(){
-            inputTextName.clear();
-            Navigator.pop(context);
-          }),
-          MaterialButton(
-          child: Text("Create"),
-          onPressed:(){
-            try{
-              SchoolRepository().createSchool(inputTextName.text, 'Color', 'Imagen');
-              Navigator.pop(context);
-            }catch(e){
-              print(e);
-              Navigator.pop(context);
-            }
-          }),
-      ],
-     ));
-
+  void createSchool() {
+    var user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      print("Usuario no autenticado. No se puede crear una escuela.");
+      return;
+    }
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            content: TextField(
+              controller: inputTextName,
+              decoration: InputDecoration(hintText: "Nombre de la escuela"),
+            ),
+            actions: [
+              MaterialButton(
+                child: Text("Cancel"),
+                onPressed: () async {
+                  inputTextName.clear();
+                  Navigator.pop(context);
+                },
+              ),
+              MaterialButton(
+                child: Text("Create"),
+                onPressed: () async {
+                  try {
+                    _schoolRepository.createSchool(
+                      inputTextName.text,
+                      'Color',
+                      'Imagen',
+                    );
+                    inputTextName.clear();
+                    getSchools();
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  } catch (e) {
+                    print(e);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          ),
+    );
   }
+
+  getSchools() async {
+    var result = await _schoolRepository.getSchoolFromUser();
+    setState(() {
+      schools = result ?? [];
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSchools();
+  }
+
   @override
   Widget build(BuildContext context) {
     //get usermail
     return Scaffold(
       floatingActionButton: FloatingActionButton.small(
         child: const Icon(Icons.add),
-        onPressed: ()async{
+        onPressed: () async {
           createSchool();
-         }),
-      body:
-       ListView(
-         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-         children: [
-          //   const SizedBox(height: 50),
-          //   ElevatedButton(
-          //    onPressed: pickImageFromGallery, 
-          //    child: const Text("Imagen Galeria"),
-          //  ),
-          //   const SizedBox(height: 15),
-
-          //  ElevatedButton(
-          //    onPressed: pickImageFromCamera, 
-          //    child: const Text("Imagen camara"),
-          //  ),
-          //   _selectedImage != null ? Image.file(_selectedImage!) : const Text("Please selected an image")
-         ]
-       )          
+        },
+      ),
+      body: Center(
+        child:
+            schools.isEmpty
+                ? Text("There are no Schools")
+                : ListView.builder(
+                  itemCount: schools.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      padding: EdgeInsets.all(10),
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            bottom: 0,
+                            child: Text(
+                              schools[index]['name'] ?? 'Sin nombre',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Builder(builder: (context)=> IconButton(
+                              onPressed: () async {
+                                showPopover(
+                                  height: 35,
+                                  width: 300,
+                                  direction: PopoverDirection.top,
+                                  arrowHeight: 0,
+                                  context: context,
+                                  bodyBuilder: (context) => PopoverItem()
+                                );
+                              },
+                              icon: Icon(Icons.more_horiz),
+                            ),)
+                            
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+      ),
     );
   }
-
-
-//   Future pickImageFromGallery() async{
-//     final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-//     if(returnedImage == null) return;
-//     setState(() {
-//       _selectedImage = File(returnedImage!.path);
-//     });
-//   }
-
-
-//  Future pickImageFromCamera() async{
-//     final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
-
-//     if(returnedImage == null) return;
-//     setState(() {
-//       _selectedImage = File(returnedImage!.path);
-//     });
-//   }
-
 }
-
-

@@ -1,5 +1,5 @@
 class School {
-   String? id;
+   int? id;
    String name;
    String? color;
    String? image;
@@ -9,16 +9,16 @@ class School {
   Map<String, dynamic> toJson(){
     return{
       'name':name,
-      'color': color,
-      'image':image,
+      'color': color?? '',
+      'image':image?? '',
     };
   }
-  factory School.fromJson(Map<String, dynamic>json){
+  factory School.fromJson(Map<String, dynamic> data){
     return School(
-      id: json['id'],
-      name: json['name'],
-      color: json['color'],
-      image: json['image'],
+      id: data['id'] as int,
+      name: data['name'] as String,
+      color: data['color'] as String?,
+      image: data['image'] as String?,
      );
   }
 
