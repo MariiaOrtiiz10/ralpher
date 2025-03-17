@@ -8,7 +8,6 @@ class School {
 
   Map<String, dynamic> toJson(){
     return{
-      'id':id,
       'name':name,
       'color': color,
       'image':image,

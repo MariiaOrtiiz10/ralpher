@@ -16,8 +16,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController inputTextName = TextEditingController();
 
   UserModel? currentUser;
-  File ? _selectedImage;
-  Uint8List? _webImage;
+  // File ? _selectedImage;
+  // Uint8List? _webImage;
 
   void createSchool(){
     showDialog(context: context,
@@ -55,49 +55,49 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton.small(
         child: const Icon(Icons.add),
-        onPressed: (){
+        onPressed: ()async{
           createSchool();
          }),
       body:
        ListView(
          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
          children: [
-            const SizedBox(height: 50),
-            ElevatedButton(
-             onPressed: pickImageFromGallery, 
-             child: const Text("Imagen Galeria"),
-           ),
-            const SizedBox(height: 15),
+          //   const SizedBox(height: 50),
+          //   ElevatedButton(
+          //    onPressed: pickImageFromGallery, 
+          //    child: const Text("Imagen Galeria"),
+          //  ),
+          //   const SizedBox(height: 15),
 
-           ElevatedButton(
-             onPressed: pickImageFromCamera, 
-             child: const Text("Imagen camara"),
-           ),
-            _selectedImage != null ? Image.file(_selectedImage!) : const Text("Please selected an image")
+          //  ElevatedButton(
+          //    onPressed: pickImageFromCamera, 
+          //    child: const Text("Imagen camara"),
+          //  ),
+          //   _selectedImage != null ? Image.file(_selectedImage!) : const Text("Please selected an image")
          ]
        )          
     );
   }
 
 
-  Future pickImageFromGallery() async{
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+//   Future pickImageFromGallery() async{
+//     final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(returnedImage == null) return;
-    setState(() {
-      _selectedImage = File(returnedImage!.path);
-    });
-  }
+//     if(returnedImage == null) return;
+//     setState(() {
+//       _selectedImage = File(returnedImage!.path);
+//     });
+//   }
 
 
- Future pickImageFromCamera() async{
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+//  Future pickImageFromCamera() async{
+//     final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
 
-    if(returnedImage == null) return;
-    setState(() {
-      _selectedImage = File(returnedImage!.path);
-    });
-  }
+//     if(returnedImage == null) return;
+//     setState(() {
+//       _selectedImage = File(returnedImage!.path);
+//     });
+//   }
 
 }
 
