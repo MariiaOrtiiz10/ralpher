@@ -1,8 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:popover/popover.dart';
-import 'package:ralpher/data/models/school.dart';
 import 'package:ralpher/data/repositories/school_repository.dart';
+import 'package:ralpher/widgets/colorPicker_item.dart';
 import 'package:ralpher/widgets/popover_item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,8 +15,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController inputTextName = TextEditingController();
-  List<Map<String, dynamic>> schools = [];
+  //Map<String, dynamic> dataSchools = {};
+  List<Map<String, dynamic>> dataSchools = [];
+
   final SchoolRepository _schoolRepository = SchoolRepository();
+  Color? selectedColor;
   // File ? _selectedImage;
   // Uint8List? _webImage;
 
@@ -30,37 +33,104 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder:
           (context) => AlertDialog(
-            content: TextField(
-              controller: inputTextName,
-              decoration: InputDecoration(hintText: "Nombre de la escuela"),
+            title: const Text("Crear nueva escuela"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: inputTextName,
+                  decoration: const InputDecoration(labelText: "Name"),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("Color"),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                      final color = await showModalBottomSheet<Color>(
+                      context: context,
+                      isDismissible: true,
+                      enableDrag: true,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      builder: (context) => ColorPickerItem(
+                        initialColor: selectedColor ?? const Color.fromARGB(255, 0, 23, 230),
+                        onColorChanged: (color) {
+                          setState(() {
+                            selectedColor = color;
+                          });
+                        },
+                      ),
+                    );
+                    if (color != null) {
+                      setState(() {
+                        selectedColor = color;
+                      });
+                    }
+                  },
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: selectedColor ?? const Color.fromARGB(255, 0, 23, 230),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.black, width: 0.5),
+                    ),
+                  ),
+                    ),
+                  ],
+                ),
+              ],
             ),
             actions: [
-              MaterialButton(
-                child: Text("Cancel"),
-                onPressed: () async {
+              TextButton(
+                onPressed: () {
                   inputTextName.clear();
+                  selectedColor = null;
                   Navigator.pop(context);
                 },
+                child: const Text("Cancelar"),
               ),
-              MaterialButton(
-                child: Text("Create"),
+              // Botón para crear la escuela
+              TextButton(
                 onPressed: () async {
-                  try {
-                    _schoolRepository.createSchool(
-                      inputTextName.text,
-                      'Color',
-                      'Imagen',
+                  if (inputTextName.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Ingresa un nombre para la escuela."),
+                      ),
                     );
+                    return;
+                  }
+
+                  try {
+                    String colorHex =
+                        "#${selectedColor!.value.toRadixString(16).substring(2)}";
+                    await _schoolRepository.createSchool(
+                      inputTextName.text,
+                      colorHex,
+                      null,
+                    );
+
                     inputTextName.clear();
+                    selectedColor = null;
                     getSchools();
+
                     if (context.mounted) {
                       Navigator.pop(context);
                     }
                   } catch (e) {
                     print(e);
-                    Navigator.pop(context);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
                   }
                 },
+                child: const Text("Crear"),
               ),
             ],
           ),
@@ -70,14 +140,27 @@ class _HomePageState extends State<HomePage> {
   getSchools() async {
     var result = await _schoolRepository.getSchoolFromUser();
     setState(() {
-      schools = result ?? [];
+      dataSchools = result ?? [];
+
+      print("DataSchools $dataSchools");
     });
+  }
+
+  deleteSchool(int id) async {
+    await _schoolRepository.deleteSchool(id);
+    getSchools();
+  }
+
+  Color hexToColor(String code) {
+    return Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
   @override
   void initState() {
     super.initState();
     getSchools();
+    selectedColor;
+    print("DataSchools $dataSchools");
   }
 
   @override
@@ -92,11 +175,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child:
-            schools.isEmpty
+            dataSchools.isEmpty
                 ? Text("There are no Schools")
                 : ListView.builder(
-                  itemCount: schools.length,
+                  itemCount: dataSchools.length,
                   itemBuilder: (context, index) {
+                    Color backgroundColor = hexToColor(
+                      dataSchools[index]['color'],
+                    );
                     return Container(
                       margin: EdgeInsets.symmetric(
                         horizontal: 50,
@@ -105,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsets.all(10),
                       height: 150,
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: backgroundColor,
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: Stack(
@@ -114,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                             left: 0,
                             bottom: 0,
                             child: Text(
-                              schools[index]['name'] ?? 'Sin nombre',
+                              dataSchools[index]['name'],
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -134,7 +220,13 @@ class _HomePageState extends State<HomePage> {
                                         direction: PopoverDirection.top,
                                         arrowHeight: 0,
                                         context: context,
-                                        bodyBuilder: (context) => PopoverItem(),
+                                        bodyBuilder:
+                                            (context) => PopoverItem(
+                                              deleteTab:
+                                                  () => deleteSchool(
+                                                    dataSchools[index]['id'],
+                                                  ),
+                                            ),
                                       );
                                     },
                                     icon: Icon(Icons.more_horiz),

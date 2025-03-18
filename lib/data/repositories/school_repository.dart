@@ -6,15 +6,17 @@ class SchoolRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
   //Create
   Future<void> createSchool(String name, String? color, String? image) async {
-    try {
       final currentUser = Supabase.instance.client.auth.currentUser;
-      final responseCreateSchool = await _supabase.from("schools").insert({
+      try {
+      if (currentUser != null) {
+         await _supabase.from("schools").insert({
         'name': name,
         'color': color,
         'image': image,
       });
-    } catch (e) {
-      print("Error al insertar escuela: $e");
+      }
+      } catch (e) {
+      print('Error insert school:  $e');
     }
   }
 
@@ -27,7 +29,7 @@ class SchoolRepository {
         return response;
       }
     } catch (e) {
-      print('Error fetching user data:  $e');
+      print('Error fetching school data:  $e');
     }
     return null;
   }
@@ -38,7 +40,15 @@ class SchoolRepository {
   }
 
   //Delete
-  Future deleteSchool() async {
-    
+  Future deleteSchool(int schoolid) async {
+    final currentUser = _supabase.auth.currentUser;
+    try {
+      if (currentUser != null) {
+         await _supabase.from('schools').delete().eq('id', schoolid);
+      }
+    } catch (e) {
+      print('Error delete school:  $e');
+    }
+    return null;
   }
 }
