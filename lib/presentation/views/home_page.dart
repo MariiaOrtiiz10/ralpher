@@ -124,20 +124,22 @@ class _HomePageState extends State<HomePage> {
                           Positioned(
                             right: 0,
                             top: 0,
-                            child: Builder(builder: (context)=> IconButton(
-                              onPressed: () async {
-                                showPopover(
-                                  height: 35,
-                                  width: 300,
-                                  direction: PopoverDirection.top,
-                                  arrowHeight: 0,
-                                  context: context,
-                                  bodyBuilder: (context) => PopoverItem()
-                                );
-                              },
-                              icon: Icon(Icons.more_horiz),
-                            ),)
-                            
+                            child: Builder(
+                              builder:
+                                  (context) => IconButton(
+                                    onPressed: () async {
+                                      showPopover(
+                                        height: 35,
+                                        width: 300,
+                                        direction: PopoverDirection.top,
+                                        arrowHeight: 0,
+                                        context: context,
+                                        bodyBuilder: (context) => PopoverItem(),
+                                      );
+                                    },
+                                    icon: Icon(Icons.more_horiz),
+                                  ),
+                            ),
                           ),
                         ],
                       ),

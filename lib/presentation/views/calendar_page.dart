@@ -15,120 +15,153 @@ class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<Event>> events = {};
   late final ValueNotifier<List<Event>> _selectedEvents;
   TextEditingController _eventController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_focusedDay));
   }
-  
+
   @override
-void dispose() {
-  super.dispose();
-}
+  void dispose() {
+    _eventController.dispose();
+    super.dispose();
+  }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
-        _selectedDay=selectedDay;
-        _focusedDay=focusedDay;
+        _selectedDay = selectedDay;
+        _focusedDay = focusedDay;
+        _selectedEvents.value = _getEventsForDay(selectedDay);
       });
     }
-    
   }
 
   List<Event> _getEventsForDay(DateTime day) {
     return events[day] ?? [];
   }
 
-
   @override
-  Widget calendar(){
-      return Column(
-        children: [
-          Container(
-            child: TableCalendar(
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-                titleTextStyle: TextStyle(color: const Color.fromARGB(255, 1, 37, 66),
-                fontSize:20,
-                fontWeight: FontWeight.bold),
+  Widget calendar() {
+    return Column(
+      children: [
+        Container(
+          child: TableCalendar(
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                color: const Color.fromARGB(255, 1, 37, 66),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              
-    
-              availableGestures: AvailableGestures.all,
-              selectedDayPredicate:(day)=>isSameDay(_selectedDay, day) ,
-              focusedDay: _focusedDay, 
-              firstDay: DateTime.utc(0), 
-              lastDay: DateTime.utc(9999),
-              onDaySelected:_onDaySelected,
-              eventLoader: _getEventsForDay,
-              ),
-          ),
-          SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents, 
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length, 
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        onTap: () => print(""),
-                        title: Text('${value[index]}'),
-                      ),
-                    );
-                });
-              }),
-          )
-        ],
+            ),
 
-      );
-    }
+            availableGestures: AvailableGestures.all,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            focusedDay: _focusedDay,
+            firstDay: DateTime.utc(0),
+            lastDay: DateTime.utc(9999),
+            onDaySelected: _onDaySelected,
+            eventLoader: _getEventsForDay,
+          ),
+        ),
+        SizedBox(height: 8.0),
+        Expanded(
+          child: ValueListenableBuilder<List<Event>>(
+            valueListenable: _selectedEvents,
+            builder: (context, value, _) {
+              return ListView.builder(
+                itemCount: value.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () => print(""),
+                      title: Text(value[index].title),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: calendar(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
-            context: context, 
+            context: context,
             builder: (context) {
               return AlertDialog(
                 scrollable: true,
                 title: Text("Event Name"),
                 content: Padding(
                   padding: EdgeInsets.all(8),
-                  child: TextField(
-                    controller: _eventController,
-                  ),
+                  child: TextField(controller: _eventController),
                 ),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      events.addAll({
-                        _focusedDay!: [Event(_eventController.text)]
-                      });
-                      Navigator.of(context).pop();
-                      _selectedEvents.value = _getEventsForDay(_selectedDay!);
-                    }, 
+                      if (_eventController.text.isNotEmpty) {
+                        final newEvent = Event(_eventController.text);
+
+                        // Verifica si ya existe un evento con el mismo nombre en el día seleccionado
+                        if (events[_selectedDay!]?.any(
+                              (event) => event.title == newEvent.title,
+                            ) ??
+                            false) {
+                          // Muestra un mensaje de error si el evento ya existe
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Ya existe un evento con el mismo nombre en este día.",
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        } else {
+                          // Agrega el nuevo evento
+                          setState(() {
+                            if (events[_selectedDay!] != null) {
+                              events[_selectedDay!]!.add(
+                                newEvent,
+                              ); // Agrega el evento a la lista existente
+                            } else {
+                              events[_selectedDay!] = [
+                                newEvent,
+                              ]; // Crea una nueva lista con el evento
+                            }
+                            _selectedEvents.value = _getEventsForDay(
+                              _selectedDay!,
+                            ); // Actualiza la lista de eventos
+                          });
+                        }
+
+                        _eventController.clear(); // Limpia el campo de texto
+                        Navigator.of(context).pop();
+                      }
+                    },
                     child: Text("Submit"),
-                  )
+                  ),
                 ],
               );
-            });
+            },
+          );
         },
         child: Icon(Icons.add),
       ),
-
     );
-    
   }
 }
