@@ -22,6 +22,7 @@ class _ColorPickerItemState extends State<ColorPickerItem> {
   void initState() {
     super.initState();
     _colorNotifier = ValueNotifier<Color>(widget.initialColor);
+
   }
 
   @override
@@ -35,11 +36,10 @@ class _ColorPickerItemState extends State<ColorPickerItem> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           ),
           child: Column(
             children: [
-              // Botón de cerrar (cruz)
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
@@ -60,7 +60,7 @@ class _ColorPickerItemState extends State<ColorPickerItem> {
                           color: color,
                           onChanged: (value) {
                             _colorNotifier.value = value;
-                            widget.onColorChanged(value); // Notifica a HomePage
+                            widget.onColorChanged(value); 
                           },
                         );
                       },
