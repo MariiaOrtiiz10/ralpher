@@ -31,9 +31,9 @@ class _MainHomePageState extends State<MainHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(appBarTitles[myIndex]), 
-      ),
+      // appBar: AppBar(
+      //   title: Text(appBarTitles[myIndex]), 
+      // ),
       body: IndexedStack(
         index: myIndex, 
         children: pages, 
