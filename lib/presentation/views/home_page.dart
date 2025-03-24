@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:popover/popover.dart';
-import 'package:ralpher/data/repositories/school_repository.dart';
-import 'package:ralpher/widgets/colorPicker_item.dart';
 import 'package:ralpher/widgets/popover_item.dart';
+import 'package:ralpher/data/repositories/school_repository.dart';
+import 'package:ralpher/data/repositories/school_repository.dart';
+import 'package:ralpher/presentation/viewmodels/viewmodels.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController inputTextName = TextEditingController();
   List<Map<String, dynamic>> dataSchools = [];
   final SchoolRepository _schoolRepository = SchoolRepository();
+  //final ViewModels _viewModels = ViewModels();
   Color? selectedColor;
 
   void handleColorChanged(Color? color) {
@@ -128,7 +130,9 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: Colors.white,
                       minimumSize: Size(double.infinity, 60),
                     ),
-                    onPressed: () async {},
+                    onPressed: () async {
+                      
+                    },
                     child: const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -140,6 +144,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
+
 
                   const Spacer(),
 
@@ -162,12 +167,14 @@ class _HomePageState extends State<HomePage> {
                       try {
                         String colorHex =
                             "#${selectedColor!.value.toRadixString(16).substring(2)}";
+
                         await _schoolRepository.createSchool(
                           inputTextName.text,
                           colorHex,
                           null,
                           null,
                         );
+
                         inputTextName.clear();
                         getSchools();
                         selectedColor = null;
@@ -310,11 +317,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.small(
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          createSchool();
-        },
+      appBar: AppBar(
+        title: Text("Schools"),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () async {
+              createSchool();
+            },
+            icon: Icon(Icons.add),
+            color: const Color.fromARGB(255, 39, 133, 211),
+            iconSize: 30,
+          ),
+        ],
       ),
       body: Center(
         child:
