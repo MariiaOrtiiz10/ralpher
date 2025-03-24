@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ralpher/data/repositories/user_repository.dart';
 import 'package:ralpher/presentation/viewmodels/event_viewmodel.dart';
+import 'package:ralpher/presentation/views/createSchool.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  final UserRepository userRepository;
+  const CalendarPage({super.key, required this.userRepository});
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -58,7 +61,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             availableGestures: AvailableGestures.all,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             focusedDay: _focusedDay,
@@ -96,72 +98,104 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: calendar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                scrollable: true,
-                title: Text("Event Name"),
-                content: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: TextField(controller: _eventController),
+    return Navigator(
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder:
+              (context) => Scaffold(
+                appBar: AppBar(
+                  actions: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.person,
+                      ), // Icono para redirigir a CreateSchool
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CreateSchool(
+                                  userRepository:
+                                      widget
+                                          .userRepository, // Pasa el UserRepository
+                                ), // Navega a CreateSchool.dart
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_eventController.text.isNotEmpty) {
-                        final newEvent = Event(_eventController.text);
+                body: calendar(),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          scrollable: true,
+                          title: Text("Event Name"),
+                          content: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(controller: _eventController),
+                          ),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (_eventController.text.isNotEmpty) {
+                                  final newEvent = Event(_eventController.text);
 
-                        // Verifica si ya existe un evento con el mismo nombre en el día seleccionado
-                        if (events[_selectedDay!]?.any(
-                              (event) => event.title == newEvent.title,
-                            ) ??
-                            false) {
-                          // Muestra un mensaje de error si el evento ya existe
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Ya existe un evento con el mismo nombre en este día.",
-                              ),
-                              duration: Duration(seconds: 2),
+                                  // Verifica si ya existe un evento con el mismo nombre en el día seleccionado
+                                  if (events[_selectedDay!]?.any(
+                                        (event) =>
+                                            event.title == newEvent.title,
+                                      ) ??
+                                      false) {
+                                    // Muestra un mensaje de error si el evento ya existe
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Ya existe un evento con el mismo nombre en este día.",
+                                        ),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                  } else {
+                                    // Agrega el nuevo evento
+                                    setState(() {
+                                      if (events[_selectedDay!] != null) {
+                                        events[_selectedDay!]!.add(
+                                          newEvent,
+                                        ); // Agrega el evento a la lista existente
+                                      } else {
+                                        events[_selectedDay!] = [
+                                          newEvent,
+                                        ]; // Crea una nueva lista con el evento
+                                      }
+                                      _selectedEvents.value = _getEventsForDay(
+                                        _selectedDay!,
+                                      ); // Actualiza la lista de eventos
+                                    });
+                                  }
+
+                                  _eventController
+                                      .clear(); // Limpia el campo de texto
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: Text("Submit"),
                             ),
-                          );
-                        } else {
-                          // Agrega el nuevo evento
-                          setState(() {
-                            if (events[_selectedDay!] != null) {
-                              events[_selectedDay!]!.add(
-                                newEvent,
-                              ); // Agrega el evento a la lista existente
-                            } else {
-                              events[_selectedDay!] = [
-                                newEvent,
-                              ]; // Crea una nueva lista con el evento
-                            }
-                            _selectedEvents.value = _getEventsForDay(
-                              _selectedDay!,
-                            ); // Actualiza la lista de eventos
-                          });
-                        }
-
-                        _eventController.clear(); // Limpia el campo de texto
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: Text("Submit"),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: Icon(Icons.add),
-      ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Icon(Icons.add),
+                ),
+              ),
+        );
+      },
     );
   }
 }

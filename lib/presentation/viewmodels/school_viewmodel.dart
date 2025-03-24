@@ -7,14 +7,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // provides a way to notify the UI when the data changes
 class SchoolViewmodel extends ChangeNotifier {
-
-//Function to pick image form gallery
-File? _selectedImage;
+  //Function to pick image form gallery
+  File? _selectedImage;
 
   File? get selectedImage => _selectedImage;
 
   Future<void> pickImageFromGallery() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final returnedImage = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (returnedImage == null) return;
     _selectedImage = File(returnedImage.path);
@@ -22,37 +23,43 @@ File? _selectedImage;
   }
 
   Future<void> pickImageFromCamera() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    final returnedImage = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
 
     if (returnedImage == null) return;
     _selectedImage = File(returnedImage.path);
     notifyListeners();
   }
-//Function tu upload the image 
+  //Function tu upload the image
 
-Future<String?> _uploadImage(ImagePicker picker, XFile? selectedImage) async {
-   if (selectedImage == null) return null; // Verificamos que haya una imagen
+  Future<String?> _uploadImage(ImagePicker picker, XFile? selectedImage) async {
+    if (selectedImage == null) return null; // Verificamos que haya una imagen
 
-   try {
-     final supabase = Supabase.instance.client; // Instancia correcta de Supabase
-     final bytes = await selectedImage!.readAsBytes();
-     final fileExt = selectedImage!.path.split('.').last;
-     final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
-     final filePath = 'uploads/$fileName';
+    try {
+      final supabase =
+          Supabase.instance.client; // Instancia correcta de Supabase
+      final bytes = await selectedImage!.readAsBytes();
+      final fileExt = selectedImage!.path.split('.').last;
+      final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+      final filePath = 'uploads/$fileName';
 
-     final storageResponse = await supabase.storage.from('images').uploadBinary(
-           filePath,
-           bytes,
-           fileOptions: FileOptions(contentType: selectedImage!.mimeType), // Corregido
-         );
+      final storageResponse = await supabase.storage
+          .from('images')
+          .uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: selectedImage!.mimeType,
+            ), // Corregido
+          );
 
-    return storageResponse;
+      return storageResponse;
     } catch (e) {
-     print('Error al subir la imagen: $e');
-     return null;
+      print('Error al subir la imagen: $e');
+      return null;
+    }
   }
-}
-//Function to create a Schoolobjet and insert it into supabase
-}
 
-
+  //Function to create a Schoolobjet and insert it into supabase
+}
