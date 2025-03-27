@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:popover/popover.dart';
+import 'package:ralpher/presentation/views/createSchool.dart';
 import 'package:ralpher/widgets/popover_item.dart';
 import 'package:ralpher/data/repositories/school_repository.dart';
 import 'package:ralpher/data/repositories/school_repository.dart';
@@ -18,8 +21,10 @@ class _HomePageState extends State<HomePage> {
   TextEditingController inputTextName = TextEditingController();
   List<Map<String, dynamic>> dataSchools = [];
   final SchoolRepository _schoolRepository = SchoolRepository();
-  //final ViewModels _viewModels = ViewModels();
+  final ViewModels _viewModels = ViewModels();
+
   Color? selectedColor;
+  String? imgurl;
 
   void handleColorChanged(Color? color) {
     setState(() {
@@ -131,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () async {
-                      
+                     await _viewModels.pickImage();
                     },
                     child: const Align(
                       alignment: Alignment.centerLeft,
@@ -144,8 +149,21 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 20),
+                  if (_viewModels.selectedImage != null)
+                    Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: FileImage(_viewModels.selectedImage!),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
 
-
+                   
                   const Spacer(),
 
                   ElevatedButton(
@@ -171,8 +189,8 @@ class _HomePageState extends State<HomePage> {
                         await _schoolRepository.createSchool(
                           inputTextName.text,
                           colorHex,
-                          null,
-                          null,
+                          _viewModels.imageName,
+                           _viewModels.imageUrl,
                         );
 
                         inputTextName.clear();
@@ -353,6 +371,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Stack(
                         children: [
+                          Positioned.fill(
+                            child: GestureDetector(
+                              onTap: () {
+                                print("clicado");
+                              },
+                              child: Container(color: Colors.transparent),
+                            ),
+                          ),
                           Positioned(
                             left: 0,
                             bottom: 0,
