@@ -36,27 +36,47 @@ class _CreateSchoolState extends State<CreateSchool> {
     _loadUserData();
   }
 
+  @override
+  void dispose() {
+    // Limpiar cualquier recurso si es necesario
+    super.dispose();
+  }
+
   Future<void> _loadUserData() async {
     try {
       final user = await widget.userRepository.getCurrentUserData();
+      if (!mounted) return; // Verificar si el widget está montado
+
       if (user != null) {
         final role = await widget.userRepository.getUserRole(user.id);
+        if (!mounted) return; // Verificar nuevamente antes de setState
+
         setState(() {
           currentUser = user;
           userRole = role;
           isLoading = false;
         });
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     } catch (e) {
       print('Error loading user data: $e');
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _pickImage() async {
     final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    if (!mounted) return; // Verificar si el widget está montado
+
     setState(() {
       _image = pickedImage;
     });
