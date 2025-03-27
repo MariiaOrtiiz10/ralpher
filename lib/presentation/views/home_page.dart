@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () async {
-                     await _viewModels.pickImage();
+                      
                     },
                     child: const Align(
                       alignment: Alignment.centerLeft,
@@ -149,21 +149,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  if (_viewModels.selectedImage != null)
-                    Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: FileImage(_viewModels.selectedImage!),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
 
-                   
+
                   const Spacer(),
 
                   ElevatedButton(
