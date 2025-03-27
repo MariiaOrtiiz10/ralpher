@@ -4,15 +4,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:ralpher/core/services/auth_service.dart';
 import 'package:ralpher/data/models/user_model.dart';
 import 'package:ralpher/data/repositories/user_repository.dart';
-import 'package:ralpher/presentation/views/class_page.dart';
-import 'package:ralpher/presentation/views/schedule_page.dart';
-import 'package:ralpher/presentation/views/release_page.dart';
-import 'package:ralpher/presentation/views/fouls_page.dart';
-import 'package:ralpher/presentation/views/incidents_page.dart';
-import 'package:ralpher/presentation/views/schoolGrades_page.dart';
-import 'package:ralpher/presentation/views/courses_page.dart';
-import 'package:ralpher/presentation/views/information_page.dart';
-import 'package:ralpher/presentation/views/users_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/class_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/schedule_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/release_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/fouls_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/incidents_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/schoolGrades_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/courses_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/information_page.dart';
+import 'package:ralpher/presentation/views/ViewSchool/users_page.dart';
 
 class CreateSchool extends StatefulWidget {
   final UserRepository userRepository;
