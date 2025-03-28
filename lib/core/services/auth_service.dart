@@ -27,7 +27,7 @@ class AuthService {
   //get user email
   String? getCurrentUserEmail(){
     final session = _supabase.auth.currentSession;
-    if (session != null && session.user != null) {
+    if (session != null) {
       final user = session.user;
       return user.email;
   }

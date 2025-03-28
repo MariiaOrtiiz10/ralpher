@@ -22,9 +22,12 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> dataSchools = [];
   final SchoolRepository _schoolRepository = SchoolRepository();
   final ViewModels _viewModels = ViewModels();
+  Map<String, dynamic>? schedule;
+  Map<String, dynamic>? calendarSettings;
 
   Color? selectedColor;
   String? imgurl;
+   String? imgname;
 
   void handleColorChanged(Color? color) {
     setState(() {
@@ -136,7 +139,13 @@ class _HomePageState extends State<HomePage> {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () async {
-                      
+                    final imageData= await _viewModels.pickImage();
+                    if (imageData != null) {
+                      setState(() {
+                        imgname = imageData?['imgname'];
+                        imgurl = imageData?['imgurl'];
+                      });
+                    }
                     },
                     child: const Align(
                       alignment: Alignment.centerLeft,
@@ -149,7 +158,16 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-
+                  SizedBox(
+                    width: 150,
+                    height: 150,
+                    child:
+                        imgurl != null
+                            ? Image.network(imgurl!, fit: BoxFit.cover)
+                            : Container(
+                              child: const Center(child: Text("No image")),
+                            ),
+                  ),
 
                   const Spacer(),
 
@@ -176,8 +194,10 @@ class _HomePageState extends State<HomePage> {
                         await _schoolRepository.createSchool(
                           inputTextName.text,
                           colorHex,
-                          _viewModels.imageName,
-                           _viewModels.imageUrl,
+                          imgname,
+                          imgurl,
+                          null,
+                          null,
                         );
 
                         inputTextName.clear();
@@ -199,6 +219,7 @@ class _HomePageState extends State<HomePage> {
                         "Create",
                         style: TextStyle(fontSize: 15, color: Colors.black),
                       ),
+                      
                     ),
                   ),
                 ],
@@ -296,7 +317,6 @@ class _HomePageState extends State<HomePage> {
     var result = await _schoolRepository.getSchoolFromUser();
     setState(() {
       dataSchools = result ?? [];
-
       print("DataSchools $dataSchools");
     });
   }

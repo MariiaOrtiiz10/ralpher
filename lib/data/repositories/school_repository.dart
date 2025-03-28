@@ -1,11 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/school.dart';
 
 class SchoolRepository {
   //conexion
   final SupabaseClient _supabase = Supabase.instance.client;
   //Create
-  Future<void> createSchool(String name, String? color, String? imgname, String? imgurl) async {
+  Future<void> createSchool(String name, String? color, String? imgname, String? imgurl, Map<String, dynamic>? schedule, Map<String, dynamic>? calendarSettings) async {
       final currentUser = Supabase.instance.client.auth.currentUser;
       try {
       if (currentUser != null) {
@@ -14,6 +13,9 @@ class SchoolRepository {
         'color': color,
         'imgname': imgname,
         'imgurl': imgurl,
+        'schedule' : schedule,
+        'calendar_settings' : calendarSettings,
+
       });
       }
       } catch (e) {
