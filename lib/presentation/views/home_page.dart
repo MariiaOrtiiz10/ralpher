@@ -1,12 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:popover/popover.dart';
-import 'package:ralpher/presentation/views/createSchool.dart';
 import 'package:ralpher/widgets/popover_item.dart';
-import 'package:ralpher/data/repositories/school_repository.dart';
 import 'package:ralpher/data/repositories/school_repository.dart';
 import 'package:ralpher/presentation/viewmodels/viewmodels.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,20 +19,30 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> dataSchools = [];
   final SchoolRepository _schoolRepository = SchoolRepository();
   final ViewModels _viewModels = ViewModels();
-  Map<String, dynamic>? schedule;
-  Map<String, dynamic>? calendarSettings;
+  // Map<String, dynamic>? schedule;
+  // Map<String, dynamic>? calendarSettings;
 
   Color? selectedColor;
   String? imgurl;
-   String? imgname;
+  String? imgname;
+  File? selectedImage;
 
   void handleColorChanged(Color? color) {
     setState(() {
       selectedColor = color;
     });
   }
-  // File ? _selectedImage;
-  // Uint8List? _webImage;
+  void handleImageChanged(String? imageurl){
+    setState(() {
+      imgurl = imageurl;
+    });
+  }
+  void handleImageFileChanged(File? image){
+    setState(() {
+      selectedImage = image;
+    });
+
+  }
 
   void createSchool() {
     var user = Supabase.instance.client.auth.currentUser;
@@ -139,19 +146,16 @@ class _HomePageState extends State<HomePage> {
                       minimumSize: Size(double.infinity, 60),
                     ),
                     onPressed: () async {
-                    final imageData= await _viewModels.pickImage();
-                    if (imageData != null) {
-                      setState(() {
-                        imgname = imageData?['imgname'];
-                        imgurl = imageData?['imgurl'];
-                      });
-                    }
+                      final image = await _viewModels.pickImage();
+                      if (image != null) {
+                        handleImageFileChanged(image);
+                       }
                     },
                     child: const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Selecciona una foto",
-                        style: TextStyle(
+                        style: TextStyle( 
                           fontSize: 15,
                           color: Color.fromARGB(255, 10, 65, 184),
                         ),
@@ -159,14 +163,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(
-                    width: 150,
-                    height: 150,
-                    child:
-                        imgurl != null
-                            ? Image.network(imgurl!, fit: BoxFit.cover)
-                            : Container(
-                              child: const Center(child: Text("No image")),
-                            ),
+                    width: 250,
+                    height: 250,
+                    child: selectedImage != null
+                        ? Image.file(selectedImage!, fit: BoxFit.cover) // Muestra la imagen seleccionada
+                        : Container(
+                            color: Colors.grey[300], // Fondo gris si no hay imagen
+                            child: const Center(child: Text("No image")),
+                          ),
                   ),
 
                   const Spacer(),
@@ -181,15 +185,24 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () async {
                       if (inputTextName.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Ingresa un nombre para la escuela."),
-                          ),
+                          const SnackBar(content: Text("Ingresa un nombre para la escuela.")),
                         );
                         return;
                       }
+
                       try {
-                        String colorHex =
-                            "#${selectedColor!.value.toRadixString(16).substring(2)}";
+                        String colorHex = "#${selectedColor!.value.toRadixString(16).substring(2)}";
+
+                        String? imgname;
+                        String? imgurl;
+
+                        if (selectedImage != null) {
+                          final uploadResult = await _viewModels.uploadImage(selectedImage!);
+                          if (uploadResult != null) {
+                            imgname = uploadResult['imgname'];
+                            imgurl = uploadResult['imgurl'];
+                          }
+                        }
 
                         await _schoolRepository.createSchool(
                           inputTextName.text,
@@ -203,6 +216,8 @@ class _HomePageState extends State<HomePage> {
                         inputTextName.clear();
                         getSchools();
                         selectedColor = null;
+                        selectedImage = null; 
+
                         if (context.mounted) {
                           Navigator.pop(context);
                         }
@@ -336,7 +351,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getSchools();
-    //print("DataSchools $dataSchools");
   }
 
   @override

@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false, // Desactiva el debug banner
-      home: AuthGate(),
+     home: AuthGate(),
     );
   }
 }                                                                         
