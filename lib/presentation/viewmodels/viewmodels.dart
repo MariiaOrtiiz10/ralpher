@@ -6,6 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ViewModels extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  File? selectedImage;
+  Color? selectedColor;
+
   Future<File?> pickImage() async {
     final ImagePicker picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
@@ -13,6 +16,8 @@ class ViewModels extends ChangeNotifier {
       return null;
     }
     File imageFile = File(image.path);
+    selectedImage = imageFile;
+    notifyListeners();
     return imageFile;
   }
 
@@ -29,7 +34,7 @@ class ViewModels extends ChangeNotifier {
       notifyListeners();
       return {'imgname': imgname, 'imgurl': imgurl};
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
       return null;
     }
   }

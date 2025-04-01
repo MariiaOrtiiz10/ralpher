@@ -17,6 +17,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _schoolName = TextEditingController();
   List<Map<String, dynamic>> dataSchools = [];
+  List<dynamic> filteredSchools = []; 
+  TextEditingController searchController = TextEditingController(); 
   final SchoolRepository _schoolRepository = SchoolRepository();
   final ViewModels _viewModels = ViewModels();
   // Map<String, dynamic>? schedule;
@@ -217,6 +219,8 @@ class _HomePageState extends State<HomePage> {
                           imgurl,
                           null,
                           null,
+                          null,
+                          null,
                         );
 
                         _schoolName.clear();
@@ -252,8 +256,6 @@ class _HomePageState extends State<HomePage> {
       selectedImage = null;
     });
   }
-
-
 
 
   void openColorBottomSheet(
@@ -344,7 +346,7 @@ class _HomePageState extends State<HomePage> {
     var result = await _schoolRepository.getSchoolFromUser();
     setState(() {
       dataSchools = result ?? [];
-      print("DataSchools $dataSchools");
+      filteredSchools = List.from(dataSchools);
     });
   }
 
@@ -359,10 +361,27 @@ class _HomePageState extends State<HomePage> {
     return Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
+  void _filterSchools() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredSchools = dataSchools.where((school) {
+        final schoolName = school['name'].toLowerCase();
+        return schoolName.contains(query);
+      }).toList();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getSchools();
+    searchController.addListener(_filterSchools);
+  }
+
+   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -381,126 +400,151 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Center(
-        child:
-            dataSchools.isEmpty
-                ? Text("There are no Schools")
-                : ListView.builder(
-                  itemCount: dataSchools.length,
-                  itemBuilder: (context, index) {
-                    Color backgroundColor = hexToColor(
-                      dataSchools[index]['color'],
-                    );
-                    return GestureDetector(
-                      onTap: () {
-                        print("clicando");
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * 0.04,
-                          right: MediaQuery.of(context).size.width * 0.04,
-                          top:
-                              index == 0
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: MediaQuery.of(context).size.width * 0.04,
+              right: MediaQuery.of(context).size.width * 0.04,
+              top: MediaQuery.of(context).size.height * 0.01,
+              bottom: MediaQuery.of(context).size.height * 0.01,
+            ),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                prefixIcon: Icon(Icons.search, color: const Color.fromARGB(255, 97, 96, 96)), 
+                filled: true,
+                fillColor: Color.fromARGB(255, 235, 235, 247), // Color de fondo
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.001,
+                  horizontal: MediaQuery.of(context).size.width * 0.1,
+                ), 
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.00), 
+                  borderSide: BorderSide.none, 
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: filteredSchools.isEmpty
+                  ? Text("No se encontraron escuelas")
+                  :RefreshIndicator(
+                    color: Colors.blue, 
+                    onRefresh: () async{
+                      await getSchools();
+                    },
+                    child: ListView.builder(
+                      itemCount: filteredSchools.length,
+                      itemBuilder: (context, index) {
+                        Color backgroundColor = hexToColor(
+                          filteredSchools[index]['color'],
+                        );
+                        return GestureDetector(
+                          onTap: () {
+                            print("clicando");
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.04,
+                              right: MediaQuery.of(context).size.width * 0.04,
+                              top: index == 0
                                   ? MediaQuery.of(context).size.height * 0.01
                                   : MediaQuery.of(context).size.height * 0.03,
-                          bottom:
-                              index == dataSchools.length - 1
+                              bottom: index == filteredSchools.length - 1
                                   ? MediaQuery.of(context).size.height * 0.01
                                   : MediaQuery.of(context).size.height * 0.015,
-                        ),
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(9),
-                        ),
-                        child: Stack(
-                          children: [
-                            if (dataSchools[index]['imgurl'] != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(9),
-                                child: Image.network(
-                                  dataSchools[index]['imgurl'],
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                ),
-                              )
-                            else
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.circular(9),
-                                ),
-                              ),
-
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(
-                                  MediaQuery.of(context).size.width * 0.02,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(9),
-                                    bottomRight: Radius.circular(9),
-                                  ),
-                                ),
-                                child: Text(
-                                  dataSchools[index]['name'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                        0.04,
-                                  ),
-                                ),
-                              ),
                             ),
-
-                            // More button (kept in same position)
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Builder(
-                                builder:
-                                    (context) => IconButton(
+                            height: MediaQuery.of(context).size.height * 0.23,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Stack(
+                              children: [
+                                if (filteredSchools[index]['imgurl'] != null)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(9),
+                                    child: Image.network(
+                                      filteredSchools[index]['imgurl'],
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  )
+                                else
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                  ),
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.02,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(9),
+                                        bottomRight: Radius.circular(9),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      filteredSchools[index]['name'],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.04,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: Builder(
+                                    builder: (context) => IconButton(
                                       onPressed: () async {
                                         showPopover(
                                           height:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.height *
-                                              0.053,
+                                              MediaQuery.of(context).size.height *
+                                                  0.053,
                                           width:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              0.5,
+                                              MediaQuery.of(context).size.width *
+                                                  0.5,
                                           direction: PopoverDirection.top,
                                           arrowHeight: 0,
                                           context: context,
-                                          bodyBuilder:
-                                              (context) => PopoverItem(
-                                                deleteTab:
-                                                    () => deleteSchool(
-                                                      dataSchools[index]['id'],
-                                                    ),
-                                              ),
+                                          bodyBuilder: (context) => PopoverItem(
+                                            deleteTab: () => deleteSchool(
+                                              filteredSchools[index]['id'],
+                                            ),
+                                          ),
                                         );
                                       },
                                       icon: Icon(Icons.more_horiz),
                                     ),
-                              ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+

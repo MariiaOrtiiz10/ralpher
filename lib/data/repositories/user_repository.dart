@@ -21,7 +21,6 @@ class UserRepository {
     }
     return null;
   }
-
   // Obtener el rol del usuario desde la tabla users_school
   Future<String?> getUserRole(String userId) async {
     try {
@@ -37,7 +36,6 @@ class UserRepository {
       return null;
     }
   }
-
   //Function to saver user data to Supabase "users" table(no hace falta)
   Future<void> saveUserToDatabase(UserModel registerUser) async {
     try {
