@@ -24,7 +24,7 @@ class _PopoverItemState extends State<PopoverItem> {
           },
           child: Text('Delete', style: 
           TextStyle(
-            fontSize: 16, 
+            fontSize: MediaQuery.of(context).size.width * 0.035, 
             color: Colors.black
           )),
         ),

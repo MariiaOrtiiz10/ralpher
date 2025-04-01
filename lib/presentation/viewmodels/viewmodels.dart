@@ -6,8 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ViewModels extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-
-  Future<File?>pickImage() async {
+  Future<File?> pickImage() async {
     final ImagePicker picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image == null) {
@@ -15,19 +14,23 @@ class ViewModels extends ChangeNotifier {
     }
     File imageFile = File(image.path);
     return imageFile;
-  }  
-    Future<Map<String, String>?>uploadImage(File image) async {
+  }
+
+  Future<Map<String, String>?> uploadImage(File image) async {
     try {
-    final imageBytes = await image.readAsBytes();
-    final imgname = '${DateTime.now().millisecondsSinceEpoch}.jpeg';
+      final imageBytes = await image.readAsBytes();
+      final imgname = '${DateTime.now().millisecondsSinceEpoch}.jpeg';
       await _supabase.storage
           .from('imageschools')
           .uploadBinary('$imgname', imageBytes);
-        final imgurl = _supabase.storage.from('imageschools').getPublicUrl(imgname);
-         notifyListeners(); 
-        return {'imgname': imgname, 'imgurl': imgurl};
+      final imgurl = _supabase.storage
+          .from('imageschools')
+          .getPublicUrl(imgname);
+      notifyListeners();
+      return {'imgname': imgname, 'imgurl': imgurl};
     } catch (e) {
       print('Error: $e');
+      return null;
     }
-  } 
+  }
 }

@@ -44,4 +44,7 @@
     </queries>
     <!-- Android app needs explicit permission to use the internet connection on the user's device which is required to communicate with Supabase APIs. -->
       <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>        
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 </manifest>

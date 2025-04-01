@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController inputTextName = TextEditingController();
+  final TextEditingController _schoolName = TextEditingController();
   List<Map<String, dynamic>> dataSchools = [];
   final SchoolRepository _schoolRepository = SchoolRepository();
   final ViewModels _viewModels = ViewModels();
@@ -27,29 +27,24 @@ class _HomePageState extends State<HomePage> {
   String? imgname;
   File? selectedImage;
 
-  void handleColorChanged(Color? color) {
-    setState(() {
-      selectedColor = color;
-    });
-  }
-  void handleImageChanged(String? imageurl){
-    setState(() {
-      imgurl = imageurl;
-    });
-  }
-  void handleImageFileChanged(File? image){
-    setState(() {
-      selectedImage = image;
-    });
-
-  }
-
   void createSchool() {
     var user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       print("Usuario no autenticado. No se puede crear una escuela.");
       return;
     }
+    void handleColorChanged(Color? color) {
+      setState(() {
+        selectedColor = color;
+      });
+    }
+
+    void handleImageFileChanged(File? image) {
+      setState(() {
+        selectedImage = image;
+      });
+    }
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -89,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: TextField(
-                      controller: inputTextName,
+                      controller: _schoolName,
                       decoration: InputDecoration(
                         hintText: "Name",
                         hintStyle: TextStyle(
@@ -149,13 +144,13 @@ class _HomePageState extends State<HomePage> {
                       final image = await _viewModels.pickImage();
                       if (image != null) {
                         handleImageFileChanged(image);
-                       }
+                      }
                     },
                     child: const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Selecciona una foto",
-                        style: TextStyle( 
+                        style: TextStyle(
                           fontSize: 15,
                           color: Color.fromARGB(255, 10, 65, 184),
                         ),
@@ -165,12 +160,18 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     width: 250,
                     height: 250,
-                    child: selectedImage != null
-                        ? Image.file(selectedImage!, fit: BoxFit.cover) // Muestra la imagen seleccionada
-                        : Container(
-                            color: Colors.grey[300], // Fondo gris si no hay imagen
-                            child: const Center(child: Text("No image")),
-                          ),
+                    child:
+                        selectedImage != null
+                            ? Image.file(
+                              selectedImage!,
+                              fit: BoxFit.cover,
+                            ) // Muestra la imagen seleccionada
+                            : Container(
+                              color:
+                                  Colors
+                                      .grey[300], // Fondo gris si no hay imagen
+                              child: const Center(child: Text("No image")),
+                            ),
                   ),
 
                   const Spacer(),
@@ -183,21 +184,26 @@ class _HomePageState extends State<HomePage> {
                       minimumSize: Size(double.infinity, 40),
                     ),
                     onPressed: () async {
-                      if (inputTextName.text.isEmpty) {
+                      if (_schoolName.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Ingresa un nombre para la escuela.")),
+                          const SnackBar(
+                            content: Text("Ingresa un nombre para la escuela."),
+                          ),
                         );
                         return;
                       }
 
                       try {
-                        String colorHex = "#${selectedColor!.value.toRadixString(16).substring(2)}";
+                        String colorHex =
+                            "#${selectedColor!.value.toRadixString(16).substring(2)}";
 
                         String? imgname;
                         String? imgurl;
 
                         if (selectedImage != null) {
-                          final uploadResult = await _viewModels.uploadImage(selectedImage!);
+                          final uploadResult = await _viewModels.uploadImage(
+                            selectedImage!,
+                          );
                           if (uploadResult != null) {
                             imgname = uploadResult['imgname'];
                             imgurl = uploadResult['imgurl'];
@@ -205,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                         }
 
                         await _schoolRepository.createSchool(
-                          inputTextName.text,
+                          _schoolName.text,
                           colorHex,
                           imgname,
                           imgurl,
@@ -213,10 +219,10 @@ class _HomePageState extends State<HomePage> {
                           null,
                         );
 
-                        inputTextName.clear();
+                        _schoolName.clear();
                         getSchools();
                         selectedColor = null;
-                        selectedImage = null; 
+                        selectedImage = null;
 
                         if (context.mounted) {
                           Navigator.pop(context);
@@ -234,15 +240,21 @@ class _HomePageState extends State<HomePage> {
                         "Create",
                         style: TextStyle(fontSize: 15, color: Colors.black),
                       ),
-                      
                     ),
                   ),
                 ],
               ),
             ),
           ),
-    );
+    ).whenComplete(() {
+      _schoolName.clear();
+      selectedColor = null;
+      selectedImage = null;
+    });
   }
+
+
+
 
   void openColorBottomSheet(
     BuildContext context,
@@ -379,65 +391,111 @@ class _HomePageState extends State<HomePage> {
                     Color backgroundColor = hexToColor(
                       dataSchools[index]['color'],
                     );
-                    return Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 15,
-                      ),
-                      padding: EdgeInsets.all(10),
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: backgroundColor,
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: GestureDetector(
-                              onTap: () {
-                                print("clicado");
-                              },
-                              child: Container(color: Colors.transparent),
-                            ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            bottom: 0,
-                            child: Text(
-                              dataSchools[index]['name'],
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                    return GestureDetector(
+                      onTap: () {
+                        print("clicando");
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.04,
+                          right: MediaQuery.of(context).size.width * 0.04,
+                          top:
+                              index == 0
+                                  ? MediaQuery.of(context).size.height * 0.01
+                                  : MediaQuery.of(context).size.height * 0.03,
+                          bottom:
+                              index == dataSchools.length - 1
+                                  ? MediaQuery.of(context).size.height * 0.01
+                                  : MediaQuery.of(context).size.height * 0.015,
+                        ),
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: Stack(
+                          children: [
+                            if (dataSchools[index]['imgurl'] != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(9),
+                                child: Image.network(
+                                  dataSchools[index]['imgurl'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              )
+                            else
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: backgroundColor,
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                              ),
+
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.02,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: backgroundColor,
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(9),
+                                    bottomRight: Radius.circular(9),
+                                  ),
+                                ),
+                                child: Text(
+                                  dataSchools[index]['name'],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                        0.04,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Builder(
-                              builder:
-                                  (context) => IconButton(
-                                    onPressed: () async {
-                                      showPopover(
-                                        height: 40,
-                                        width: 300,
-                                        direction: PopoverDirection.top,
-                                        arrowHeight: 0,
-                                        context: context,
-                                        bodyBuilder:
-                                            (context) => PopoverItem(
-                                              deleteTab:
-                                                  () => deleteSchool(
-                                                    dataSchools[index]['id'],
-                                                  ),
-                                            ),
-                                      );
-                                    },
-                                    icon: Icon(Icons.more_horiz),
-                                  ),
+
+                            // More button (kept in same position)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Builder(
+                                builder:
+                                    (context) => IconButton(
+                                      onPressed: () async {
+                                        showPopover(
+                                          height:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              0.053,
+                                          width:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.5,
+                                          direction: PopoverDirection.top,
+                                          arrowHeight: 0,
+                                          context: context,
+                                          bodyBuilder:
+                                              (context) => PopoverItem(
+                                                deleteTab:
+                                                    () => deleteSchool(
+                                                      dataSchools[index]['id'],
+                                                    ),
+                                              ),
+                                        );
+                                      },
+                                      icon: Icon(Icons.more_horiz),
+                                    ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
