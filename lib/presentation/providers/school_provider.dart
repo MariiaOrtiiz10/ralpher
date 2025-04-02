@@ -4,28 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:ralpher/presentation/viewmodels/viewmodels.dart';
 
 class SchoolProvider extends ChangeNotifier {
-  final TextEditingController _schoolName = TextEditingController();
-  Color? _selectedColor;
+  // ignore: prefer_final_fields
+  TextEditingController _nameSchool = TextEditingController();
+  // ignore: prefer_final_fields
+  Color _selectedColor = Colors.white;
   File? _selectedImage;
+  ViewModels? _viewModels;
 
-  final ViewModels _viewModels = ViewModels();
-
-  TextEditingController get schoolName => _schoolName;
-  Color? get selectedColor => _selectedColor;
+  TextEditingController get nameSchool => _nameSchool;
+  Color get selectedColor => _selectedColor;
   File? get selectedImage => _selectedImage;
 
-  void setColor(Color color) {
-    _selectedColor = color;
+  Future<File?> pickImage() async {
+    _selectedImage = await _viewModels!.pickImage();
     notifyListeners();
-  }
-
-  void setImage(File image) {
-    _selectedImage = image;
-    notifyListeners();
-  }
-
-  Future<void> pickImage() async {
-    final image = await _viewModels.pickImage();
-    
+    return _selectedImage;
   }
 }

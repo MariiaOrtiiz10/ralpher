@@ -14,8 +14,7 @@ class MainHomePage extends StatefulWidget {
 class _MainHomePageState extends State<MainHomePage> {
   final _userRepository = UserRepository();
   int myIndex = 0;
-  late List<Widget> pages; // Se declara sin inicializar
-  final List<String> appBarTitles = ["Schools", "Calendar", "Settings"];
+  late List<Widget> pages; 
   // Lista de páginas
   @override
   void initState() {
@@ -32,6 +31,7 @@ class _MainHomePageState extends State<MainHomePage> {
     return Scaffold(
       // appBar: AppBar(title: Text(appBarTitles[myIndex])),
       body: IndexedStack(index: myIndex, children: pages),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
@@ -42,11 +42,16 @@ class _MainHomePageState extends State<MainHomePage> {
         },
         currentIndex: myIndex,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+             label: 'Home'
+          ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),
             label: 'Calendar',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
